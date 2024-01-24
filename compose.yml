@@ -1,0 +1,41 @@
+version: "3.9"
+services:
+  tandoor:
+    build:
+      args:
+        ALPINE_VERSION: "latest"
+        CONTAINER_VERSION: "1.15.11"
+        TANDOOR_VERSION: "1.15.11"
+      context: .
+      dockerfile: container.build
+      no_cache: true
+      tags:
+        - "tandoor:build"
+        - "gautada/tandoor:build"
+        - "gautada/tandoor:latest"
+    image: "gautada/tandoor:latest"
+    ports:
+      - "5432:5432"
+    volumes:
+      - "Container:/mnt/volumes/container"
+      - "Backup:/mnt/volumes/backup"
+      - "Configmaps:/mnt/volumes/configmaps"
+      - "Secrets:/mnt/volumes/secrets"
+
+volumes:
+  Container:
+    external: true
+    name: "Container"
+
+  Backup:
+    external: true
+    name: "Backup"
+
+  Configmaps:
+    external: true
+    name: "Configmaps"
+    
+  Secrets:
+    external: true
+    name: "Secrets"
+

@@ -1,0 +1,15 @@
+ARG ALPINE_VERSION=3.18.2
+
+# │ STAGE: BUILD                                      
+# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
+FROM gautada/alpine:$ALPINE_VERSION as SOURCE
+
+ARG TANDOOR_VERSION=0.14.2
+ARG TANDORR_BRANCH=v"$TANDOOR_VERSION"
+
+RUN apk add --no-cache build-base git
+
+RUN git config --global advice.detachedHead false
+RUN git clone --branch $TANDOOR_BRANCH --depth 1 https://github.com/TandoorRecipes/recpes.git
+
+WORKDIR /recipes
