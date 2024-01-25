@@ -15,7 +15,7 @@ services:
         - "gautada/tandoor:latest"
     image: "gautada/tandoor:latest"
     ports:
-      - "5432:5432"
+      - "8080:8080"
     volumes:
       - "Container:/mnt/volumes/container"
       - "Backup:/mnt/volumes/backup"
