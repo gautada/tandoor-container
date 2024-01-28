@@ -1,6 +1,6 @@
 kind: pipeline
 type: exec
-name: CICD - PostgreSQL Container
+name: recipe - Tandoor Container
 
 platform:
   os: linux
