@@ -4,18 +4,18 @@ ARG ALPINE_VERSION=3.18.2
 # ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
 FROM gautada/alpine:$ALPINE_VERSION as SOURCE
 
-ARG TANDOOR_VERSION=1.15.11
+ARG TANDOOR_VERSION=1.5.11
 
 
 
-RUN apk add --no-cache build-base git python3 python3-dev py3-pip libffi-dev openldap-dev 
+RUN /sbin/apk add --no-cache build-base git python3 python3-dev py3-pip libffi-dev openldap-dev 
 
-RUN git config --global advice.detachedHead false
-RUN git clone --depth 1 https://github.com/TandoorRecipes/recipes.git
+RUN /usr/bin/git config --global advice.detachedHead false
+RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/TandoorRecipes/recipes.git
 
 WORKDIR /recipes
 
-RUN python3 -m venv venv
+RUN /usr/bin/python3 -m venv venv
 RUN source venv/bin/activate
 RUN venv/bin/pip install --upgrade pip
 RUN venv/bin/pip install wheel==0.37.1 
@@ -23,13 +23,18 @@ RUN venv/bin/pip install setuptools_rust==1.1.2
 RUN venv/bin/pip install -r requirements.txt --no-cache-dir
 
 WORKDIR /recipes/vue
-RUN apk add --no-cache yarn
-RUN yarn install
-RUN yarn build
+RUN /sbin/apk add --no-cache yarn
+RUN /usr/bin/yarn install
+RUN /usr/bin/yarn build
+
+RUN /sbin/apk add --no-cache postgresql16-client
+
+RUN /bin/mkdir -p /opt/recipes
+RUN /bin/ln -svf /mnt/volumes/container/media /opt/recipes/mediafiles 
 
 # ╭―
 # │ ENTRYPOINT
 # ╰――――――――――――――――――――
 COPY entrypoint /etc/container/entrypoint
 
-
+WORKDIR /
