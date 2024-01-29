@@ -4,8 +4,8 @@ services:
     build:
       args:
         ALPINE_VERSION: "latest"
-        CONTAINER_VERSION: "1.15.11"
-        TANDOOR_VERSION: "1.15.11"
+        CONTAINER_VERSION: "1.5.11"
+        TANDOOR_VERSION: "1.5.11"
       context: .
       dockerfile: container.build
       no_cache: true
@@ -14,8 +14,16 @@ services:
         - "gautada/tandoor:build"
         - "gautada/tandoor:latest"
     image: "gautada/tandoor:latest"
+    environment:
+    - SECRET_KEY=${COMPOSE_YOUR_SECRET_KEY}
+    - DB_ENGINE=django.db.backends.postgresql 
+    - POSTGRES_HOST=${COMPOSE_POSTGRES_HOST}
+    - POSTGRES_PORT=5432 
+    - POSTGRES_USER=tandoor 
+    - POSTGRES_PASSWORD=${COMPOSE_POSTGRES_PASSWORD}
+    - POSTGRES_DB=tandoordb
     ports:
-      - "5432:5432"
+      - "8080:8080"
     volumes:
       - "Container:/mnt/volumes/container"
       - "Backup:/mnt/volumes/backup"

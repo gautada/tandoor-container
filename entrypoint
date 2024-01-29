@@ -9,8 +9,13 @@
 ENTRYPOINT_PARAMS="$@"
 . /etc/profile
 
-CONTAINER_NAME="postgres"
- tail -f /dev/null
+CONTAINER_NAME="tandoor"
+
+container_entrypoint() {
+ cd /recipes
+ # chmod +x boot.sh
+ . ./boot.sh 
+ # tail -f /dev/null
 }
 
 container_version() {
