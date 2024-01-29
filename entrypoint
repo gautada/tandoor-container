@@ -13,8 +13,9 @@ CONTAINER_NAME="tandoor"
 
 container_entrypoint() {
  cd /recipes
- chmod +x boot.sh
- ./boot.sh 
+ # chmod +x boot.sh
+ . ./boot.sh 
+ # tail -f /dev/null
 }
 
 container_version() {

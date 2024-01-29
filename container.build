@@ -1,40 +1,80 @@
 ARG ALPINE_VERSION=3.18.2
 
-# │ STAGE: BUILD                                      
-# ╰―――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――――
-FROM gautada/alpine:$ALPINE_VERSION as SOURCE
+# │ STAGE: CONTAINER
+# ╰――――――――――――――――――――――――――――――――――――――――――――――――――――――
+FROM gautada/alpine:$ALPINE_VERSION as CONTAINER
 
-ARG TANDOOR_VERSION=1.5.11
+# ╭――――――――――――――――――――╮
+# │ METADATA           │
+# ╰――――――――――――――――――――╯
+LABEL source="https://github.com/gautada/tandoor-container.git"
+LABEL maintainer="Adam Gautier <adam@gautier.org>"
+LABEL description="A Tandoor recipe server container"
 
+# ╭―
+# │ USER
+# ╰――――――――――――――――――――
+ARG USER=tandoor
+RUN /usr/sbin/usermod -l $USER alpine
+RUN /usr/sbin/usermod -d /home/$USER -m $USER
+RUN /usr/sbin/groupmod -n $USER alpine
+RUN /bin/echo "$USER:$USER" | /usr/sbin/chpasswd
 
-
-RUN /sbin/apk add --no-cache build-base git python3 python3-dev py3-pip libffi-dev openldap-dev 
-
-RUN /usr/bin/git config --global advice.detachedHead false
-RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/TandoorRecipes/recipes.git
-
-WORKDIR /recipes
-
-RUN /usr/bin/python3 -m venv venv
-RUN source venv/bin/activate
-RUN venv/bin/pip install --upgrade pip
-RUN venv/bin/pip install wheel==0.37.1 
-RUN venv/bin/pip install setuptools_rust==1.1.2
-RUN venv/bin/pip install -r requirements.txt --no-cache-dir
-
-WORKDIR /recipes/vue
-RUN /sbin/apk add --no-cache yarn
-RUN /usr/bin/yarn install
-RUN /usr/bin/yarn build
-
-RUN /sbin/apk add --no-cache postgresql16-client
-
-RUN /bin/mkdir -p /opt/recipes
-RUN /bin/ln -svf /mnt/volumes/container/media /opt/recipes/mediafiles 
+# ╭―
+# │ BACKUP
+# ╰――――――――――――――――――――
+# COPY backup /etc/container/backup
 
 # ╭―
 # │ ENTRYPOINT
 # ╰――――――――――――――――――――
 COPY entrypoint /etc/container/entrypoint
 
+# ╭――――――――――――――――――――╮
+# │ APPLICATION        │
+# ╰――――――――――――――――――――╯
+ARG TANDOOR_VERSION=1.5.11
+
 WORKDIR /
+RUN /usr/bin/git config --global advice.detachedHead false
+RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/TandoorRecipes/recipes.git
+
+
+RUN /sbin/apk add --no-cache build-base nodejs postgresql16-client python3 python3-dev libffi-dev openldap-dev yarn
+
+
+WORKDIR /recipes
+RUN /usr/bin/python3 -m venv venv
+RUN source venv/bin/activate
+RUN venv/bin/pip install --upgrade pip
+
+# RUN venv/bin/pip install wheel==0.37.1 
+# RUN venv/bin/pip install setuptools_rust==1.1.2
+
+RUN venv/bin/pip install -r requirements.txt --no-cache-dir
+# RUN deactivate
+# RUN /usr/bin/python -m venv --clear venv
+
+# WORKDIR /recipes/vue
+# RUN /usr/bin/yarn install
+# RUN /usr/bin/yarn build
+# RUN /bin/rm -rf ./src 
+# 
+WORKDIR /recipes
+RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
+
+RUN /bin/mkdir -p /opt/recipes
+RUN /bin/ln -svf /mnt/volumes/container/media /opt/recipes/mediafiles 
+
+RUN chown $USER:$USER -R /recipes
+
+# ╭――――――――――――――――――――╮
+# │ CONTAINER          │
+# ╰――――――――――――――――――――╯
+USER $USER
+VOLUME /mnt/volumes/backup
+VOLUME /mnt/volumes/configmaps
+VOLUME /mnt/volumes/container
+VOLUME /mnt/volumes/secrets
+EXPOSE 8080/tcp
+WORKDIR /home/$USER
