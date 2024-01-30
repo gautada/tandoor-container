@@ -9,3 +9,4 @@
 
 ## Notes
 - 2024-01-30: Needed to have the vue folder built but to do so in the container build ment that the image was too big.  The build or the server works and deploys but a runtime error occurs.  To mitigate `/recipes/rebuildvue.sh` is provided to build the vue scripts in the container storage. 
+- FF
