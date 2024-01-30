@@ -40,8 +40,8 @@ RUN /usr/bin/git config --global advice.detachedHead false
 RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/TandoorRecipes/recipes.git
 
 
-RUN /sbin/apk add --no-cache build-base nodejs postgresql16-client python3 python3-dev libffi-dev openldap-dev yarn
-
+# nodejs - removed to get vue working.ls 
+RUN /sbin/apk add --no-cache build-base postgresql16-client python3 python3-dev libffi-dev openldap-dev yarn
 
 WORKDIR /recipes
 RUN /usr/bin/python3 -m venv venv
@@ -55,11 +55,11 @@ RUN venv/bin/pip install -r requirements.txt --no-cache-dir
 # RUN deactivate
 # RUN /usr/bin/python -m venv --clear venv
 
-# WORKDIR /recipes/vue
-# RUN /usr/bin/yarn install
-# RUN /usr/bin/yarn build
-# RUN /bin/rm -rf ./src 
-# 
+RUN /bin/mv /recipes/vue /recipes/vue~
+RUN /bin/ln -svf /mnt/volumes/container/vue /recipes/vue
+# RUN /bin/mkdir /recipes/vue
+COPY rebuildvue.sh /recipes/rebuildvue.sh
+ 
 WORKDIR /recipes
 RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
 
