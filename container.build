@@ -68,9 +68,7 @@ RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
 
 RUN chown $USER:$USER -R /opt/recipes
 
-# ╭――――――――――――――――――――╮
-# │ CONTAINER          │
-# ╰――――――――――――――――――――╯
+RUN /sbin/apk del build-base python3-dev libffi-dev openldap-dev
 
 # ╭―
 # │ FINAL CONTAINER
