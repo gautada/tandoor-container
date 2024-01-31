@@ -41,30 +41,32 @@ RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/Ta
 WORKDIR /opt/recipes
 
 # nodejs - removed to get vue working.
-RUN /sbin/apk add --no-cache build-base postgresql16-client python3 python3-dev libffi-dev openldap-dev yarn
+RUN /sbin/apk add --no-cache build-base postgresql16-client python3 python3-dev libffi-dev openldap-dev zip
+# yarn
 
 RUN /usr/bin/python3 -m venv venv
 RUN source venv/bin/activate
 RUN venv/bin/pip install --upgrade pip
-
-# RUN venv/bin/pip install wheel==0.37.1 
-# RUN venv/bin/pip install setuptools_rust==1.1.2
-
 RUN venv/bin/pip install -r requirements.txt --no-cache-dir
-
-# RUN /bin/mv /recipes/vue /recipes/vue~
-# RUN /bin/ln -svf /mnt/volumes/container/vue /recipes/vue
-# RUN /bin/mkdir /recipes/vue
-# COPY rebuildvue.sh /recipes/rebuildvue.sh
- 
-# WORKDIR /recipes
-
-# collect information from git repositories
+WORKDIR /opt/recipes
 RUN /opt/recipes/venv/bin/python version.py
-# delete git repositories to reduce image size
 
-RUN find . -type d -name ".git" | xargs rm -rf
-RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
+
+# delete git repositories to reduce image size
+# RUN find . -type d -name ".git" | xargs rm -rf
+# RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
+
+COPY cookbook-static-vue.zip /opt/recipes/cookbook/static/vue.zip
+WORKDIR /opt/recipes/cookbook/static
+RUN /usr/bin/unzip vue.zip
+RUN /bin/ln -svf cookbook-static-vue vue
+RUN rm -rvf __MACOSX vue.zip
+COPY vue/* /opt/recipes/vue/
+RUN /bin/mkdir  -p /opt/recipes/vue~
+RUN /bin/mv /opt/recipes/vue/babel.config.js /opt/recipes/vue~/
+RUN /bin/mv /opt/recipes/vue/babel.config.js.c /opt/recipes/vue~/
+RUN /bin/mv /opt/recipes/vue/package.json /opt/recipes/vue~/
+RUN /bin/mv /opt/recipes/vue/tsconfig.json /opt/recipes/vue~/
 
 RUN chown $USER:$USER -R /opt/recipes
 

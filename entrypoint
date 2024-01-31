@@ -12,13 +12,13 @@ ENTRYPOINT_PARAMS="$@"
 CONTAINER_NAME="tandoor"
 
 container_entrypoint() {
-    if [ ! -f /opt/recipes/vue/webpack-stats.json ]; then
-        echo "Running setup"
-        cd /opt/recipes/vue
-        /usr/bin/yarn install
-        /usr/bin/yarn build
-        /bin/rm /bin/rm -rvf babel.config.js babel.config.js.c node_modules/ package.json tsconfig.json
-    fi
+    # if [ ! -f /opt/recipes/vue/webpack-stats.json ]; then
+    #     echo "Running setup"
+    #     cd /opt/recipes/vue
+    #     /usr/bin/yarn install
+    #     /usr/bin/yarn build
+    #     /bin/rm /bin/rm -rvf babel.config.js babel.config.js.c node_modules/ package.json tsconfig.json
+    # fi
     cd /opt/recipes
     . /opt/recipes/boot.sh 
     # tail -f /dev/null
