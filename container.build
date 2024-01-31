@@ -73,21 +73,21 @@ RUN /sbin/apk del build-base python3-dev libffi-dev openldap-dev
 # ╭―
 # │ FINAL CONTAINER
 # ╰――――――――――――――――――――
-FROM scratch
-COPY --from=CONTAINER / /
-ENTRYPOINT ["/usr/bin/container-entrypoint"]
-VOLUME /mnt/volumes/backup
-VOLUME /mnt/volumes/configmaps
-VOLUME /mnt/volumes/container
-VOLUME /mnt/volumes/secrets
-EXPOSE 8080/tcp
-USER tandoor
-WORKDIR /home/tandoor
-
-# USER $USER
+# FROM scratch
+# COPY --from=CONTAINER / /
+# ENTRYPOINT ["/usr/bin/container-entrypoint"]
 # VOLUME /mnt/volumes/backup
 # VOLUME /mnt/volumes/configmaps
 # VOLUME /mnt/volumes/container
 # VOLUME /mnt/volumes/secrets
 # EXPOSE 8080/tcp
-# WORKDIR /home/$USER
+# USER tandoor
+# WORKDIR /home/tandoor
+
+USER $USER
+VOLUME /mnt/volumes/backup
+VOLUME /mnt/volumes/configmaps
+VOLUME /mnt/volumes/container
+VOLUME /mnt/volumes/secrets
+EXPOSE 8080/tcp
+WORKDIR /home/$USER
