@@ -56,17 +56,24 @@ RUN /opt/recipes/venv/bin/python version.py
 # RUN find . -type d -name ".git" | xargs rm -rf
 # RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
 
-COPY cookbook-static-vue.zip /opt/recipes/cookbook/static/vue.zip
+COPY cookbook-static-vue.zip /cookbook-static-vue.zip
 WORKDIR /opt/recipes/cookbook/static
-RUN /usr/bin/unzip vue.zip
-RUN /bin/ln -svf cookbook-static-vue vue
-RUN rm -rvf __MACOSX vue.zip
-COPY vue/* /opt/recipes/vue/
-RUN /bin/mkdir  -p /opt/recipes/vue~
-RUN /bin/mv /opt/recipes/vue/babel.config.js /opt/recipes/vue~/
-RUN /bin/mv /opt/recipes/vue/babel.config.js.c /opt/recipes/vue~/
-RUN /bin/mv /opt/recipes/vue/package.json /opt/recipes/vue~/
-RUN /bin/mv /opt/recipes/vue/tsconfig.json /opt/recipes/vue~/
+RUN /usr/bin/unzip /cookbook-static-vue.zip
+RUN /bin/rm /cookbook-static-vue.zip
+
+# RUN /bin/ln -svf cookbook-static-vue vue
+# RUN rm -rvf __MACOSX vue.zip
+# COPY vue.zip /vue.zip
+# RUN /bin/mkdir  -p /opt/recipes/vue~
+# RUN /bin/mv /opt/recipes/vue/babel.config.js /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/babel.config.js.c /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/package.json /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/tsconfig.json /opt/recipes/vue~/
+# WORKDIR /opt/recipes/vue
+# RUN /usr/bin/unzip /vue.zip
+
+COPY webpack-stats.json /opt/recipes/vue/webpack-stats.json
+
 
 RUN chown $USER:$USER -R /opt/recipes
 
