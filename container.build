@@ -35,42 +35,64 @@ COPY entrypoint /etc/container/entrypoint
 # ╰――――――――――――――――――――╯
 ARG TANDOOR_VERSION=1.5.11
 
-WORKDIR /
+WORKDIR /opt
 RUN /usr/bin/git config --global advice.detachedHead false
 RUN /usr/bin/git clone --branch $TANDOOR_VERSION --depth 1 https://github.com/TandoorRecipes/recipes.git
+WORKDIR /opt/recipes
 
+# nodejs - removed to get vue working.
+RUN /sbin/apk add --no-cache build-base postgresql16-client python3 python3-dev libffi-dev openldap-dev zip
+# yarn
 
-RUN /sbin/apk add --no-cache build-base nodejs postgresql16-client python3 python3-dev libffi-dev openldap-dev yarn
-
-
-WORKDIR /recipes
 RUN /usr/bin/python3 -m venv venv
 RUN source venv/bin/activate
 RUN venv/bin/pip install --upgrade pip
-
-# RUN venv/bin/pip install wheel==0.37.1 
-# RUN venv/bin/pip install setuptools_rust==1.1.2
-
 RUN venv/bin/pip install -r requirements.txt --no-cache-dir
-# RUN deactivate
-# RUN /usr/bin/python -m venv --clear venv
+WORKDIR /opt/recipes
+RUN /opt/recipes/venv/bin/python version.py
 
-# WORKDIR /recipes/vue
-# RUN /usr/bin/yarn install
-# RUN /usr/bin/yarn build
-# RUN /bin/rm -rf ./src 
-# 
-WORKDIR /recipes
-RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
 
-RUN /bin/mkdir -p /opt/recipes
-RUN /bin/ln -svf /mnt/volumes/container/media /opt/recipes/mediafiles 
+# delete git repositories to reduce image size
+# RUN find . -type d -name ".git" | xargs rm -rf
+# RUN /bin/rm -rf .git .github .gitignore .idea CONTRIBUTERS.md Dockerfile docs
 
-RUN chown $USER:$USER -R /recipes
+COPY cookbook-static-vue.zip /cookbook-static-vue.zip
+WORKDIR /opt/recipes/cookbook/static
+RUN /usr/bin/unzip /cookbook-static-vue.zip
+RUN /bin/rm /cookbook-static-vue.zip
 
-# ╭――――――――――――――――――――╮
-# │ CONTAINER          │
-# ╰――――――――――――――――――――╯
+# RUN /bin/ln -svf cookbook-static-vue vue
+# RUN rm -rvf __MACOSX vue.zip
+# COPY vue.zip /vue.zip
+# RUN /bin/mkdir  -p /opt/recipes/vue~
+# RUN /bin/mv /opt/recipes/vue/babel.config.js /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/babel.config.js.c /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/package.json /opt/recipes/vue~/
+# RUN /bin/mv /opt/recipes/vue/tsconfig.json /opt/recipes/vue~/
+# WORKDIR /opt/recipes/vue
+# RUN /usr/bin/unzip /vue.zip
+
+COPY webpack-stats.json /opt/recipes/vue/webpack-stats.json
+
+
+RUN chown $USER:$USER -R /opt/recipes
+
+RUN /sbin/apk del build-base python3-dev libffi-dev openldap-dev
+
+# ╭―
+# │ FINAL CONTAINER
+# ╰――――――――――――――――――――
+# FROM scratch
+# COPY --from=CONTAINER / /
+# ENTRYPOINT ["/usr/bin/container-entrypoint"]
+# VOLUME /mnt/volumes/backup
+# VOLUME /mnt/volumes/configmaps
+# VOLUME /mnt/volumes/container
+# VOLUME /mnt/volumes/secrets
+# EXPOSE 8080/tcp
+# USER tandoor
+# WORKDIR /home/tandoor
+
 USER $USER
 VOLUME /mnt/volumes/backup
 VOLUME /mnt/volumes/configmaps

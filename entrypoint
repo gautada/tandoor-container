@@ -12,13 +12,18 @@ ENTRYPOINT_PARAMS="$@"
 CONTAINER_NAME="tandoor"
 
 container_entrypoint() {
- cd /recipes
- # chmod +x boot.sh
- . ./boot.sh 
- # tail -f /dev/null
+    # if [ ! -f /opt/recipes/vue/webpack-stats.json ]; then
+    #     echo "Running setup"
+    #     cd /opt/recipes/vue
+    #     /usr/bin/yarn install
+    #     /usr/bin/yarn build
+    #     /bin/rm /bin/rm -rvf babel.config.js babel.config.js.c node_modules/ package.json tsconfig.json
+    # fi
+    cd /opt/recipes
+    . /opt/recipes/boot.sh 
+    # tail -f /dev/null
 }
 
 container_version() {
- # /usr/bin/postgres --version | awk -F ' ' '{print $3}'
- echo "0.0.0"
+    /usr/bin/python -c "from cookbook import version_info; print(version_info.TANDOOR_VERSION);"
 }

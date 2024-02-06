@@ -1,3 +1,5 @@
 .env
+.nova
+manifest
 recipes
-
+.DS_Store

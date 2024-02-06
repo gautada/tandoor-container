@@ -1,7 +1,5 @@
 # tandoor
 
-## About
-
 [Tandoor](https://tandoor.dev) is recipe server provides recipe management with ingredient database, meal planning, and grocery shopping capabilities.
 
 ## Code
@@ -9,4 +7,8 @@
 - This container requires that the postgresql service has the pg_trgm extension (support for similarity of text using trigram matching) enabled.  Please see notes section of the postgresql-container.
 
 
-[{'name': 'Ta
+## Notes
+- 2024-01-30: Needed to have the vue folder built but to do so in the container build ment that the image was too big.  The build or the server works and deploys but a runtime error occurs.  To mitigate `/recipes/rebuildvue.sh` is provided to build the vue scripts in the container storage. 
+- 2024-02-02: Issues with static vue libraries.  The `/opt/recipes/vue/*` files and `/opt/recipes/cookbook/static/vue/*` must be generated for building. 
+- 2024-02-05: Updating for the hourly backup mechanism
+
