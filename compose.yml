@@ -1,6 +1,9 @@
 version: "3.9"
 services:
   tandoor:
+    dns:
+    - 10.0.4.200
+    - 10.0.4.201
     build:
       args:
         ALPINE_VERSION: "latest"
@@ -14,6 +17,8 @@ services:
         - "gautada/tandoor:build"
         - "gautada/tandoor:latest"
     image: "gautada/tandoor:latest"
+    hostname: tandoor
+    container_name: tandoor
     environment:
     - SECRET_KEY=${COMPOSE_YOUR_SECRET_KEY}
     - DB_ENGINE=django.db.backends.postgresql 
